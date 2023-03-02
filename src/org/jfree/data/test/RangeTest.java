@@ -1,5 +1,7 @@
 package org.jfree.data.test;
 
+import java.security.InvalidParameterException;
+
 import org.jfree.data.Range;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -59,7 +61,7 @@ public class RangeTest extends TestCase {
 		Range r5 = new Range(-5, 3);
 		assertEquals("getLength: Did not return the expected output", 8.0, r5.getLength());
 
-		// TODO Pick 5 other methods in Range and have design tests for them
+		// TODO Pick 1 other methods in Range and have design tests for them
 	}
 
 	public void testContainsFirstValue() {
@@ -74,14 +76,177 @@ public class RangeTest extends TestCase {
 
 	public void testContainsDoesNotContain() {
 		Range r8 = new Range(-5, 3);
+		Range r9 = new Range(-5, 2);
 		assertEquals("Contains: Did not return the expected output", false, r8.contains(8));
 	}
-/*
-	public void testContainsEmptyRange() {
-		Range r9 = new Range(-5, -5);
-		assertEquals("Contains: Did not return the expected output", false, r9.contains(-5));
+	/*
+	 * public void testContainsEmptyRange() { Range r9 = new Range(-5, -5);
+	 * assertEquals("Contains: Did not return the expected output", false,
+	 * r9.contains(-5)); }
+	 */
+
+	public void testCombineNullRange() {
+		Range r10a = null;
+		Range r10b = new Range(-5, 2);
+		assertEquals("Combine: Did not return the expected output", new Range(-5, 2), r10a.combine(r10a, r10b));
+
 	}
-	*/
+
+	public void testCombineRangeNull() {
+		Range r11b = null;
+		Range r11a = new Range(-5, 2);
+		assertEquals("Combine: Did not return the expected output", new Range(-5, 2), r11a.combine(r11a, r11b));
+
+	}
+
+	public void testCombineNullNull() {
+		Range r12b = null;
+		Range r12a = null;
+		assertEquals("Combine: Did not return the expected output", null, r12a.combine(r12a, r12b));
+
+	}
+
+	public void testCombineRangeRange2ndBiggerNoGap() {
+		Range r12b = new Range(-5, 2);
+		Range r12a = new Range(2, 7);
+		assertEquals("Combine: Did not return the expected output", new Range(-5, 7), r12a.combine(r12a, r12b));
+
+	}
+
+	public void testCombineRangeRange2ndBiggerWithGap() {
+		Range r13b = new Range(-5, 2);
+		Range r13a = new Range(3, 7);
+		assertEquals("Combine: Did not return the expected output", new Range(-5, 7), r13a.combine(r13a, r13b));
+
+	}
+
+	public void testCombineRangeRange2ndSmallerNoGap() {
+		Range r14a = new Range(-5, 2);
+		Range r14b = new Range(-12, -5);
+		assertEquals("Combine: Did not return the expected output", new Range(-12, 2), r14a.combine(r14a, r14b));
+
+	}
+
+	public void testCombineRangeRange2ndSmallerWithGap() {
+		Range r15a = new Range(-5, 2);
+		Range r15b = new Range(-12, -6);
+		assertEquals("Combine: Did not return the expected output", new Range(-12, 2), r15a.combine(r15a, r15b));
+
+	}
+
+	public void testShiftNull() {
+
+		try {
+			Range r16 = null;
+			Range.shift(r16, 0);
+			fail("No exception thrown. The expected outcome was: a thrown exception of type: IllegalArgumentException");
+		} catch (Exception e) {
+			System.out.println(e.getClass());
+			assertTrue("Incorrect exception type thrown", e.getClass().equals(InvalidParameterException.class));
+		}
+
+	}
+
+	public void testShiftPositive() {
+
+		Range r17 = new Range(-5, 2);
+		assertEquals("Shift: Did not return the expected output", new Range(0, 7), Range.shift(r17, 5));
+
+	}
+	
+	public void testShiftNegative() {
+
+		Range r18 = new Range(-5, 2);
+		assertEquals("Shift: Did not return the expected output", new Range(-10, -3), Range.shift(r18, -5));
+
+	}
+	
+	public void testShiftZero() {
+
+		Range r19 = new Range(-5, 2);
+		assertEquals("Shift: Did not return the expected output", new Range(-5, 2), Range.shift(r19, 0));
+
+	}
+	
+	public void testShiftDeltaNull() {
+
+		try {
+			Range r20 = null;
+			Range.shift(r20, 0, false);
+			fail("No exception thrown. The expected outcome was: a thrown exception of type: IllegalArgumentException");
+		} catch (Exception e) {
+			System.out.println(e.getClass());
+			assertTrue("Incorrect exception type thrown", e.getClass().equals(InvalidParameterException.class));
+		}
+
+	}
+
+	public void testShiftDeltaPositiveCross() {
+
+		Range r21 = new Range(-4, 2);
+		assertEquals("Shift do not cross: Did not return the expected output", new Range(1, 7), Range.shift(r21, 5, false));
+
+	}
+	
+	public void testShiftDeltaNegativeCross() {
+
+		Range r22 = new Range(-5, 2);
+		assertEquals("Shift do not cross: Did not return the expected output", new Range(-10, -3), Range.shift(r22, -5, false));
+
+	}
+	
+	public void testShiftDeltaPositiveNoCross() {
+
+		Range r23 = new Range(-5, 2);
+		assertEquals("Shift do not cross: Did not return the expected output", new Range(-2, 5), Range.shift(r23, 3, false));
+
+	}
+	
+	public void testShiftDeltaNegativeNoCross() {
+
+		Range r24 = new Range(-5, 2);
+		assertEquals("Shift do not cross: Did not return the expected output", new Range(-6, 1), Range.shift(r24, -1, false));
+
+	}
+	
+	
+	public void testShiftDeltaPositivebecomeZero() {
+
+		Range r25 = new Range(-5, 2);
+		assertEquals("Shift do not cross: Did not return the expected output", new Range(0, 7), Range.shift(r25, 5, false));
+
+	}
+	
+	public void testShiftDeltaNegativeBecomeZero() {
+
+		Range r26 = new Range(-5, 2);
+		assertEquals("Shift do not cross: Did not return the expected output", new Range(-7, 0), Range.shift(r26, -2, false));
+
+	}
+	
+	public void testShiftDeltaZero() {
+
+		Range r27 = new Range(-5, 2);
+		assertEquals("Shift do not cross: Did not return the expected output", new Range(-5, 2), Range.shift(r27, 0, false));
+
+	}
+	
+	
+	public void testtoStringBothPositive() {
+		Range r28 = new Range(2, 5);
+		assertEquals("To String: Did not return the expected output", "Range[2,5]", r28.toString());
+	}
+	
+	public void testtoStringBothNegative() {
+		Range r29 = new Range(-5, -2);
+		assertEquals("To String: Did not return the expected output", "Range[-5,-2]", r29.toString());
+	}
+	
+	public void testtoStringOneNegative () {
+		Range r30 = new Range(-5, 5);
+		assertEquals("To String: Did not return the expected output", "Range[-5,5]", r30.toString());
+	}
+
 	
 	
 
