@@ -74,11 +74,18 @@ public class RangeTest extends TestCase {
 		assertEquals("Contains: Did not return the expected output", true, r7.contains(3));
 	}
 
-	public void testContainsDoesNotContain() {
+	public void testContainsDoesNotContainUpper() {
 		Range r8 = new Range(-5, 3);
 		Range r9 = new Range(-5, 2);
-		assertEquals("Contains: Did not return the expected output", false, r8.contains(8));
+		assertEquals("Contains: Did not return the expected output", false, r8.contains(4));
 	}
+	
+	public void testContainsDoesNotContainLower() {
+		Range r9 = new Range(-5, 2);
+		assertEquals("Contains: Did not return the expected output", false, r9.contains(-6));
+	}
+	
+	
 	/*
 	 * public void testContainsEmptyRange() { Range r9 = new Range(-5, -5);
 	 * assertEquals("Contains: Did not return the expected output", false,
@@ -134,7 +141,7 @@ public class RangeTest extends TestCase {
 
 	}
 
-	public void testShiftNull() {
+	public void testShiftNullThrowsIllegalArgumentExceptionException() {
 
 		try {
 			Range r16 = null;
@@ -168,7 +175,7 @@ public class RangeTest extends TestCase {
 
 	}
 	
-	public void testShiftDeltaNull() {
+	public void testShiftDoNotCrossNullThrowsInvalidParameterException() {
 
 		try {
 			Range r20 = null;
@@ -181,28 +188,28 @@ public class RangeTest extends TestCase {
 
 	}
 
-	public void testShiftDeltaPositiveCross() {
+	public void testShiftDoNotCrossPositiveCross() {
 
 		Range r21 = new Range(-4, 2);
 		assertEquals("Shift do not cross: Did not return the expected output", new Range(1, 7), Range.shift(r21, 5, false));
 
 	}
 	
-	public void testShiftDeltaNegativeCross() {
+	public void testShiftDoNotCrossNegativeCross() {
 
 		Range r22 = new Range(-5, 2);
 		assertEquals("Shift do not cross: Did not return the expected output", new Range(-10, -3), Range.shift(r22, -5, false));
 
 	}
 	
-	public void testShiftDeltaPositiveNoCross() {
+	public void testShiftDoNotCrossPositiveNoCross() {
 
 		Range r23 = new Range(-5, 2);
 		assertEquals("Shift do not cross: Did not return the expected output", new Range(-2, 5), Range.shift(r23, 3, false));
 
 	}
 	
-	public void testShiftDeltaNegativeNoCross() {
+	public void testShiftDoNotCrossNegativeNoCross() {
 
 		Range r24 = new Range(-5, 2);
 		assertEquals("Shift do not cross: Did not return the expected output", new Range(-6, 1), Range.shift(r24, -1, false));
@@ -210,41 +217,61 @@ public class RangeTest extends TestCase {
 	}
 	
 	
-	public void testShiftDeltaPositivebecomeZero() {
+	public void testShiftDoNotCrossPositiveUpperBoundbecomeZero() {
 
-		Range r25 = new Range(-5, 2);
-		assertEquals("Shift do not cross: Did not return the expected output", new Range(0, 7), Range.shift(r25, 5, false));
+		Range r25 = new Range(-5, -2);
+		assertEquals("Shift do not cross: Did not return the expected output", new Range(0, 0), Range.shift(r25, 5, false));
 
 	}
 	
-	public void testShiftDeltaNegativeBecomeZero() {
+	public void testShiftDoNotCrossNegativeUpperBecomeZero() {
 
 		Range r26 = new Range(-5, 2);
-		assertEquals("Shift do not cross: Did not return the expected output", new Range(-7, 0), Range.shift(r26, -2, false));
+		assertEquals("Shift do not cross: Did not return the expected output", new Range(-8, 0), Range.shift(r26, -3, false));
 
 	}
 	
-	public void testShiftDeltaZero() {
+	public void testShiftDoNotCrossPositiveLowerBoundbecomeZero() {
 
-		Range r27 = new Range(-5, 2);
-		assertEquals("Shift do not cross: Did not return the expected output", new Range(-5, 2), Range.shift(r27, 0, false));
+		Range r27 = new Range(-5, 4);
+		//System.out.println(Range.shift(r27, 6, false));
+		//System.out.println(Range.shift(r27, 7, false));
+		assertEquals("Shift do not cross: Did not return the expected output", new Range(0, 10), Range.shift(r27, 6, false));
+
+	}
+	
+	public void testShiftDoNotCrossNegativeLowerBoundBecomeZero() {
+
+		Range r28 = new Range(5, 8);
+		assertEquals("Shift do not cross: Did not return the expected output", new Range(0, 2), Range.shift(r28, -7, false));
+
+	}
+	
+	
+	public void testShiftDoNotCrossZero() {
+
+		Range r29 = new Range(-5, 2);
+		assertEquals("Shift do not cross: Did not return the expected output", new Range(-5, 2), Range.shift(r29, 0, false));
 
 	}
 	
 	
 	public void testtoStringBothPositive() {
-		Range r28 = new Range(2, 5);
-		assertEquals("To String: Did not return the expected output", "Range[2,5]", r28.toString());
+		Range r30 = new Range(2, 5);
+		//System.out.println("Pos" + r30.toString());
+		assertEquals("To String: Did not return the expected output", "Range[2.0,5.0]", r30.toString());
 	}
 	
 	public void testtoStringBothNegative() {
-		Range r29 = new Range(-5, -2);
-		assertEquals("To String: Did not return the expected output", "Range[-5,-2]", r29.toString());
+		Range r31 = new Range(-5, -2);
+		//System.out.println("Neg " +r31.toString());
+		assertEquals("To String: Did not return the expected output", "Range[-5.0,-2.0]", r31.toString());
 	}
 	
 	public void testtoStringOneNegative () {
-		Range r30 = new Range(-5, 5);
-		assertEquals("To String: Did not return the expected output", "Range[-5,5]", r30.toString());
+		Range r32 = new Range(-5, 7);
+		//System.out.println("both " +r32.toString());
+		assertEquals("To String: Did not return the expected output", "Range[-5.0,5.0]", r32.toString());
 	}
 
 	
